@@ -1,19 +1,37 @@
-import { Controller, Get, Param } from '@nestjs/common';
-import { existsSync } from 'fs';
+import { Body, Controller, Delete, Get, Param, ParseIntPipe, Patch, Post } from '@nestjs/common';
+import { CarsService } from './cars.service';
 
 @Controller('cars')
 export class CarsController {
-  private cars = ['Toyota', 'Honda', 'Jeep'];
+  constructor(
+    private readonly carsService: CarsService
+  ) {
+
+  }
   @Get()
   getAllCars() {
-    return this.cars;
+    return this.carsService.findAll();
   }
   @Get(':id')
-  getCarById(@Param('id') id: number) {
-    let isExists = this.cars.find((i, j) => j == id);
-    if (!isExists) {
-      return 'No existe un carro con ese id';
-    }
-    return this.cars[id];
+  getCarById(@Param('id', ParseIntPipe) id: number) {
+    return this.carsService.findOneById(id);
+  }
+  @Post()
+  createCar(@Body() body) {
+    return body;
+    // return this.carsService.createCar(car);
+  }
+  @Patch(':id')
+  updateCar(
+    @Param('id', ParseIntPipe) id: number,
+    @Body() body
+  ) {
+    return { id, body }
+    // return this.carsService.updateCar(id, body);
+  }
+  @Delete(':id')
+  deleteCar(@Param('id', ParseIntPipe) id: number) {
+    return { id, body: null, message: 'Car deleted' }
+    // return this.carsService.deleteCar(id);
   }
 }
